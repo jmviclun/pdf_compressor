@@ -1,0 +1,76 @@
+#!/bin/bash
+
+ if [ $# -eq "0" ]
+ then
+ echo " "
+ echo "Arguments are mandatory. For help, write: \"pdf_compressor.scp -h\" " 
+ echo " "
+ exit 1
+ fi
+
+ if [ $1 = "-h" ]
+ then
+ echo " " ; echo " ======================================================" ; echo " "
+ echo " This script compress a pdf file using Ghostscript command
+
+ SYNOPSIS
+        pdf_compressor.scp [\"input file name\"] [OPTION_resolution] [OPTION_link]
+    
+                   options are not mandatory.
+                   \"input file name\" should not contain spaces or special characters  
+
+ OPTIONS
+       -normal,    Use default PDFSETTINGS for resolution output
+
+       -medium,    Selects medium-resolution output
+
+       -low,       Selects low-resolution output
+
+       -nolink     Use only if you want to remove hyperlinks from the output pdf
+
+       -h,         Print help and quit.
+
+ AUTHOR
+       Script developed by Jose Manuel Vicent-Luna
+ "
+ echo " " ; echo " ======================================================" ; echo " "
+ exit 1
+ fi
+
+normalvar="true"
+mediumvar="false"
+lowvar="false"
+linkvar="false"
+
+for arg in "$@"
+do
+        case $arg in
+        $1) echo ""; echo "      =================" ; echo "" ; echo "      " $1 "file selected" ; echo "" ; echo "      ================="  ; echo ""
+        ;;
+        -normal) normalvar="true"
+        ;;
+        -medium) mediumvar="true" ; normalvar="false"
+        ;;
+        -low) lowvar="true" ; normalvar="false"
+        ;;
+        -nolink) linkvar="true"
+        ;;
+        *)
+        echo " "; echo "ERROR! wrong argument given. For help, write: \"pdf_compressor.scp -h\""; echo " " ; exit 1
+esac
+done
+
+
+if [ $normalvar = "true" ]
+then
+        gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPrinted=$linkvar -dNOPAUSE -dQUIET -dBATCH -sOutputFile=compressed_$1 $1
+elif [ $mediumvar = "true" ]
+then
+        gs -sDEVICE=pdfwrite -dPDFSETTINGS=/ebook -dCompatibilityLevel=1.4 -dPrinted=$linkvar -dNOPAUSE -dQUIET -dBATCH -sOutputFile=compressed_$1 $1
+elif [ $lowvar = "true" ]
+then
+        gs -sDEVICE=pdfwrite -dPDFSETTINGS=/screen -dCompatibilityLevel=1.4 -dPrinted=$linkvar -dNOPAUSE -dQUIET -dBATCH -sOutputFile=compressed_$1 $1
+else
+        echo " "
+fi
+
